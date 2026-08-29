@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        color: #333;
+      }
+      h1 {
+        color: #2e3c54;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+      .badge {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Workspace Summary: {{workspaceName}}</h1>
+    <p>Generated on: {{generatedAt}}</p>
+
+    <h3>Key Metrics</h3>
+    <ul>
+      <li>Total Projects: {{totalProjects}}</li>
+      <li>Total Members: {{totalMembers}}</li>
+    </ul>
+
+    <h3>Projects Overview</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Project Name</th>
+          <th>Task Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each projects}}
+          <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.taskCount}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>
