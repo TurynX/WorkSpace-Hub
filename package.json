@@ -21,6 +21,7 @@
     "test:e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json --runInBand",
     "test:auth": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json auth.e2e-spec.ts",
     "test:report": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json report.e2e-spec.ts",
+    "test:subscription": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json subscription.e2e-spec.ts",
     "test:prisma:studio": "dotenv -e .env.test -- prisma studio",
     "test:prisma:push": "dotenv -e .env.test -- prisma db push"
   },

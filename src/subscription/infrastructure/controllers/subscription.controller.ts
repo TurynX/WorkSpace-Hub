@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -17,6 +18,7 @@ import { CreateCheckoutUseCase } from 'src/subscription/application/use-cases/cr
 import { GetSubscriptionUseCase } from 'src/subscription/application/use-cases/get-subscription.use-case';
 import { ProcessWebhookUseCase } from 'src/subscription/application/use-cases/process-webhook.use-case';
 import Stripe from 'stripe';
+import { UpdateSubscriptionDto } from '../dtos/subscription-dto';
 
 @Controller()
 @UseGuards(AuthGuard)
@@ -34,15 +36,16 @@ export class SubscriptionController {
   async Checkout(
     @Req() req: Request,
     @Param('workspaceId') workspaceId: string,
+    @Body() body: UpdateSubscriptionDto,
   ) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('Unauthorized');
     const checkout = await this.checkoutSubscriptionUseCase.execute(
       workspaceId,
       userId,
-      userId,
+      body,
     );
-    return { data: { checkout } };
+    return { data: { url: checkout } };
   }
 
   @Get('workspace/:workspaceId/subscription')
