@@ -10,15 +10,8 @@ import {
 @Injectable()
 export class ProjectRepository implements ProjectPort {
   constructor(private readonly prisma: PrismaService) {}
-  async create(
-    data: CreateProjectDTO,
-    workspaceId: string,
-  ): Promise<ProjectEntity> {
-    const project = await this.prisma.project.create({
-      data: { ...data, workspaceId },
-      include: { tasks: true },
-    });
 
+  private mapToEntity(project: any): ProjectEntity {
     return new ProjectEntity(
       project.id,
       project.name,
@@ -29,6 +22,17 @@ export class ProjectRepository implements ProjectPort {
       project.description!,
     );
   }
+  async create(
+    data: CreateProjectDTO,
+    workspaceId: string,
+  ): Promise<ProjectEntity> {
+    const project = await this.prisma.project.create({
+      data: { ...data, workspaceId },
+      include: { tasks: true },
+    });
+
+    return this.mapToEntity(project);
+  }
 
   async getProjectFromWorkSpace(workspaceId: string): Promise<ProjectEntity[]> {
     const project = await this.prisma.project.findMany({
@@ -36,18 +40,7 @@ export class ProjectRepository implements ProjectPort {
       include: { tasks: true },
     });
 
-    return project.map(
-      (p) =>
-        new ProjectEntity(
-          p.id,
-          p.name,
-          p.createdAt,
-          p.updatedAt,
-          p.workspaceId,
-          p.tasks,
-          p.description!,
-        ),
-    );
+    return project.map((p) => this.mapToEntity(p));
   }
 
   async getProjectById(projectId: string): Promise<ProjectEntity | null> {
@@ -58,15 +51,7 @@ export class ProjectRepository implements ProjectPort {
 
     if (!project) return null;
 
-    return new ProjectEntity(
-      project.id,
-      project.name,
-      project.createdAt,
-      project.updatedAt,
-      project.workspaceId,
-      project.tasks,
-      project.description!,
-    );
+    return this.mapToEntity(project);
   }
 
   async update(
@@ -79,15 +64,7 @@ export class ProjectRepository implements ProjectPort {
       include: { tasks: true },
     });
 
-    return new ProjectEntity(
-      project.id,
-      project.name,
-      project.createdAt,
-      project.updatedAt,
-      project.workspaceId,
-      project.tasks,
-      project.description!,
-    );
+    return this.mapToEntity(project);
   }
 
   async delete(projectId: string): Promise<ProjectEntity> {
@@ -96,14 +73,6 @@ export class ProjectRepository implements ProjectPort {
       include: { tasks: true },
     });
 
-    return new ProjectEntity(
-      project.id,
-      project.name,
-      project.createdAt,
-      project.updatedAt,
-      project.workspaceId,
-      project.tasks,
-      project.description!,
-    );
+    return this.mapToEntity(project);
   }
 }

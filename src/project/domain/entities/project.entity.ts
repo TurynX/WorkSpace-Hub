@@ -7,7 +7,7 @@ export class ProjectEntity {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly workspaceId: string,
-    public readonly task: Task[],
+    public readonly tasks: Task[],
     public readonly description?: string,
   ) {}
 }

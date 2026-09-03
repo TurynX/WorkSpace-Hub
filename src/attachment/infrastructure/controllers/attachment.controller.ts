@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   InternalServerErrorException,
   MaxFileSizeValidator,
   Param,
@@ -29,13 +30,14 @@ export class AttachmentController {
     private readonly downloadAttachmentUseCase: DownloadAttachmentUseCase,
     private readonly deleteAttachmentUseCase: DeleteAttachmentUseCase,
   ) {}
-  @Post('/task/:taskId/attachment')
+  @Post('/task/:taskId/attachment/upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(
     @Req() req: Request,
     @Param('taskId') taskId: string,
     @UploadedFile(
       new ParseFilePipe({
+        errorHttpStatusCode: HttpStatus.PAYLOAD_TOO_LARGE,
         validators: [new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })],
       }),
     )
@@ -43,13 +45,23 @@ export class AttachmentController {
   ) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('No userId provided');
-    return this.uploadAttachmentUseCase.execute(taskId, file, userId);
+    const attachment = await this.uploadAttachmentUseCase.execute(
+      taskId,
+      file,
+      userId,
+    );
+    return { data: attachment };
   }
   @Get('/task/:taskId/attachments')
   async getAll(@Req() req: Request, @Param('taskId') taskId: string) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('No userId provided');
-    return this.getAllAttachmentsUseCase.execute(taskId, userId);
+    const attachments = await this.getAllAttachmentsUseCase.execute(
+      taskId,
+      userId,
+    );
+
+    return { data: attachments };
   }
 
   @Get('/attachment/:attachmentId/download')
@@ -63,13 +75,17 @@ export class AttachmentController {
     if (!url) throw new InternalServerErrorException('Failed to generate url');
     return { data: { url } };
   }
-  @Delete('/attachment/:attachmentId')
+  @Delete('/attachment/:attachmentId/delete')
   async delete(
     @Req() req: Request,
     @Param('attachmentId') attachmentId: string,
   ) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('No userId provided');
-    return this.deleteAttachmentUseCase.execute(attachmentId, userId);
+    const attachment = await this.deleteAttachmentUseCase.execute(
+      attachmentId,
+      userId,
+    );
+    return { data: attachment };
   }
 }

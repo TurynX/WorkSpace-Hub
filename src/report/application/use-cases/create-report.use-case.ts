@@ -1,23 +1,19 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { ReportPort } from 'src/report/domain/ports/report.port';
 import { CreateReportDto } from 'src/report/infrastructure/dtos/report-dto';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class CreateReportUseCase {
   constructor(
     private readonly reportRepository: ReportPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly workSpaceRepository: WorkSpacePort,
     @InjectQueue('report-queue') private readonly reportQueue: Queue,
   ) {}
 

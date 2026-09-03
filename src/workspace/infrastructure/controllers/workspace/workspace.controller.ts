@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -50,22 +51,17 @@ export class WorkspaceController {
 
   @Post()
   @HttpCode(201)
-  async create(
-    @Req() req: Request,
-    @Body() data: CreateWorkSpaceDto,
-  ): Promise<{ data: WorkSpaceEntity }> {
+  async create(@Req() req: Request, @Body() data: CreateWorkSpaceDto) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('userId not provided');
     const workSpace = await this.createWorkSpaceUseCase.execute(userId, data);
 
-    return { data: workSpace };
+    return { message: 'WorkSpace created successfully', data: workSpace };
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findUserBelong(
-    @Req() req: Request,
-  ): Promise<{ data: WorkSpaceEntity[] }> {
+  async findUserBelong(@Req() req: Request) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('userId not provided');
 
@@ -75,20 +71,18 @@ export class WorkspaceController {
       throw new InternalServerErrorException('Failed to retrieve workspaces');
     }
 
-    return { data: workspace };
+    return { message: 'Workspaces found successfully', data: workspace };
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async findById(
-    @Param('id') workSpaceId: string,
-  ): Promise<{ data: WorkSpaceEntity | null }> {
+  async findById(@Param('id') workSpaceId: string) {
     const workSpace = await this.findWorkSpaceByIdUseCase.execute(workSpaceId);
 
     if (!workSpace) {
-      throw new InternalServerErrorException('Failed to retrieve workspace');
+      throw new NotFoundException('Workspace not found');
     }
-    return { data: workSpace };
+    return { message: 'Workspace found successfully', data: workSpace };
   }
 
   @Put(':id')
@@ -107,7 +101,7 @@ export class WorkspaceController {
       data,
     );
 
-    return { data: workSpace };
+    return { message: 'Workspace updated successfully', data: workSpace };
   }
 
   @Delete(':id')
@@ -121,15 +115,18 @@ export class WorkspaceController {
     return { message: 'WorkSpace deleted successfully', data: workSpace };
   }
 
-  @Get(':id/members')
+  @Get(':workspaceId/members')
   @HttpCode(HttpStatus.OK)
-  async get(@Req() req: Request, @Param('id') id: string) {
+  async get(@Req() req: Request, @Param('workspaceId') workspaceId: string) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('userId not provided');
 
-    const members = await this.getWorkSpaceMembersUseCase.execute(id, userId);
+    const members = await this.getWorkSpaceMembersUseCase.execute(
+      workspaceId,
+      userId,
+    );
 
-    return { data: members };
+    return { message: 'Workspace members found successfully', data: members };
   }
 
   @Patch(':workspaceId/members/:memberId')
@@ -151,7 +148,7 @@ export class WorkspaceController {
       role,
     );
 
-    return { data: member };
+    return { message: 'Member updated successfully', data: member };
   }
 
   @Post(':workspaceId/members/add')

@@ -2,27 +2,20 @@ import { AttachmentPort } from 'src/attachment/domain/ports/attachment.port';
 import { AttachmentEntity } from 'src/attachment/domain/entities/attachment.entity';
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { TASK_PORT, type TaskPort } from 'src/task/domain/ports/task.port';
-import {
-  PROJECT_PORT,
-  type ProjectPort,
-} from 'src/project/domain/ports/project.port';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { TaskPort } from 'src/task/domain/ports/task.port';
+import { ProjectPort } from 'src/project/domain/ports/project.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class GetAllAttachmentsUseCase {
   constructor(
     private readonly attachmentPort: AttachmentPort,
-    @Inject(TASK_PORT) private readonly taskRepository: TaskPort,
-    @Inject(PROJECT_PORT) private readonly projectRepository: ProjectPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly taskRepository: TaskPort,
+    private readonly projectRepository: ProjectPort,
+    private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 
   async execute(

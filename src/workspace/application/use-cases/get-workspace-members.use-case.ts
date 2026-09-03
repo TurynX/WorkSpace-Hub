@@ -1,25 +1,19 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { WorkSpaceMembers } from 'src/workspace/domain/entities/workspace.entity';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class GetWorkSpaceMembersUseCase {
-  constructor(
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
-  ) {}
+  constructor(private readonly workSpaceRepository: WorkSpacePort) {}
 
   async execute(
-    userId: string,
     workSpaceId: string,
+    userId: string,
   ): Promise<WorkSpaceMembers[]> {
     const workspace =
       await this.workSpaceRepository.findWorkSpaceById(workSpaceId);

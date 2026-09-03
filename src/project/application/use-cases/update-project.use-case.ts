@@ -1,26 +1,19 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ProjectEntity } from 'src/project/domain/entities/project.entity';
-import {
-  PROJECT_PORT,
-  type ProjectPort,
-} from 'src/project/domain/ports/project.port';
+import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { CreateProjectDTO } from 'src/project/infrastructure/dtos/project.dto';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class UpdateProjectUseCase {
   constructor(
-    @Inject(PROJECT_PORT) private readonly projectRepository: ProjectPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly projectRepository: ProjectPort,
+    private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 
   async execute(

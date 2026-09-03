@@ -1,23 +1,17 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { SubscriptionEntity } from 'src/subscription/domain/entities/subscription.entity';
 
 import { SubscriptionPort } from 'src/subscription/domain/ports/subscription.port';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class GetSubscriptionUseCase {
   constructor(
-    @Inject(SubscriptionPort)
     private readonly subscriptionRepository: SubscriptionPort,
-    @Inject(WORKSPACE_PORT)
     private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 

@@ -4,20 +4,18 @@ import {
   UpdateTaskDTO,
 } from 'src/task/infrastructure/dtos/task-dto';
 
-export interface TaskPort {
-  create(
+export abstract class TaskPort {
+  abstract create(
     data: CreateTaskDTO,
     projectId: string,
     userId: string,
   ): Promise<TaskEntity>;
-  getAll(projectId: string): Promise<TaskEntity[]>;
-  getById(taskId: string): Promise<TaskEntity | null>;
-  update(
+  abstract getAll(projectId: string): Promise<TaskEntity[]>;
+  abstract getById(taskId: string): Promise<TaskEntity | null>;
+  abstract update(
     taskId: string,
     data: UpdateTaskDTO,
     userId: string,
   ): Promise<TaskEntity | null>;
-  delete(taskId:string)
+  abstract delete(taskId: string): Promise<TaskEntity>;
 }
-
-export const TASK_PORT = Symbol('TASK_PORT');

@@ -103,7 +103,7 @@ export class TaskController {
     return { data: task };
   }
 
-  @Delete('project/:projectId/task/:taskId')
+  @Delete('project/:projectId/task/:taskId/delete')
   @HttpCode(HttpStatus.OK)
   async deleteTask(
     @Req() req: Request,

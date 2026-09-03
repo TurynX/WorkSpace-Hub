@@ -1,15 +1,16 @@
-import { UserEntity } from '../entities/auth.entity';
+import { FindByEmailEntity, UserEntity } from '../entities/auth.entity';
 
-export interface AuthPort {
-  register(
+export abstract class AuthPort {
+  abstract register(
     fullName: string,
     email: string,
     password: string,
   ): Promise<UserEntity>;
 
-  login(email: string, password: string): Promise<UserEntity | null>;
+  abstract login(
+    email: string,
+    passwordHashed: string,
+  ): Promise<UserEntity | null>;
 
-  findByEmail(email: string): Promise<UserEntity | null>;
+  abstract findByEmail(email: string): Promise<FindByEmailEntity | null>;
 }
-
-export const AUTH_PORT = Symbol('AUTH_PORT');

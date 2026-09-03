@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ProjectController } from './infrastructure/controllers/project.controller';
 import { ProjectRepository } from './infrastructure/repositories/project.repository';
-import { PROJECT_PORT } from './domain/ports/project.port';
+import { ProjectPort } from './domain/ports/project.port';
 import { PrismaService } from 'src/lib/prisma/prisma.service';
 import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
 import { GetAllProjectFromWorkSpaceUseCase } from './application/use-cases/get-all-project-from-workspace.use-case';
@@ -21,12 +21,12 @@ import { WorkspaceModule } from 'src/workspace/workspace.module';
     UpdateProjectUseCase,
     DeleteProjectUseCase,
     {
-      provide: PROJECT_PORT,
+      provide: ProjectPort,
       useClass: ProjectRepository,
     },
   ],
   controllers: [ProjectController],
 
-  exports: [PROJECT_PORT],
+  exports: [ProjectPort],
 })
 export class ProjectModule {}

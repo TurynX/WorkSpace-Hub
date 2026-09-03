@@ -1,15 +1,13 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { SubscriptionTier, WorkspaceRole } from '@prisma/client';
 import { SubscriptionPort } from 'src/subscription/domain/ports/subscription.port';
 import { UpdateSubscriptionDto } from 'src/subscription/infrastructure/dtos/subscription-dto';
-import { WORKSPACE_PORT } from 'src/workspace/domain/ports/workspace.port';
 import Stripe from 'stripe';
-import { type WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { CreateSubscriptionUseCase } from './create-subscription.use-case';
 
 @Injectable()
@@ -17,7 +15,7 @@ export class CreateCheckoutUseCase {
   private stripe: Stripe;
   constructor(
     private readonly subscriptionPort: SubscriptionPort,
-    @Inject(WORKSPACE_PORT) private readonly workspacePort: WorkSpacePort,
+    private readonly workspacePort: WorkSpacePort,
     private readonly createSubscriptionUseCase: CreateSubscriptionUseCase,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_API_KEY!, {

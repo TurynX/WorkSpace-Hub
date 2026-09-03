@@ -1,21 +1,17 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { WorkspaceRole } from '@prisma/client';
 import { WorkSpaceMemberEntity } from 'src/workspace/domain/entities/workspace.entity';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class UpdateWorkSpaceMemberUseCase {
   constructor(
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 
   async execute(

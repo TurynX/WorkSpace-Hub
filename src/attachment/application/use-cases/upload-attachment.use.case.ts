@@ -1,20 +1,13 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { AttachmentRepository } from 'src/attachment/infrastructure/repository/prisma.repository';
-import { TASK_PORT, type TaskPort } from 'src/task/domain/ports/task.port';
-import {
-  PROJECT_PORT,
-  type ProjectPort,
-} from 'src/project/domain/ports/project.port';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { TaskPort } from 'src/task/domain/ports/task.port';
+import { ProjectPort } from 'src/project/domain/ports/project.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { AttachmentEntity } from 'src/attachment/domain/entities/attachment.entity';
@@ -23,9 +16,9 @@ import { AttachmentEntity } from 'src/attachment/domain/entities/attachment.enti
 export class UploadAttachmentUseCase {
   constructor(
     private readonly attachmentRepository: AttachmentRepository,
-    @Inject(TASK_PORT) private readonly taskRepository: TaskPort,
-    @Inject(PROJECT_PORT) private readonly projectRepository: ProjectPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly taskRepository: TaskPort,
+    private readonly projectRepository: ProjectPort,
+    private readonly workSpaceRepository: WorkSpacePort,
     @InjectQueue('attachment-queue') private uploadQueue: Queue,
   ) {}
 

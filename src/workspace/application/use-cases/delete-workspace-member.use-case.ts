@@ -1,19 +1,15 @@
 import {
   BadRequestException,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class DeleteWorkSpaceMemberUseCase {
   constructor(
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 
   async execute(workspaceId: string, requesterId: string, memberId: string) {

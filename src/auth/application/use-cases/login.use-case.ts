@@ -1,12 +1,12 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { AUTH_PORT, type AuthPort } from '../../domain/ports/auth.port';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthPort } from '../../domain/ports/auth.port';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
-    @Inject(AUTH_PORT) private readonly authPort: AuthPort,
+    private readonly authPort: AuthPort,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -16,7 +16,7 @@ export class LoginUseCase {
       throw new UnauthorizedException('Invalid credentials');
     }
     const isPasswordValid = await argon2.verify(
-      userExist.passwordHashed!,
+      userExist.hashedPassword,
       password,
     );
     if (!isPasswordValid) {
@@ -31,7 +31,6 @@ export class LoginUseCase {
       sub: user.id,
       email: user.email,
     });
-    const { passwordHashed, ...userWithoutPassword } = user;
-    return { userWithoutPassword, token };
+    return { user, token };
   }
 }

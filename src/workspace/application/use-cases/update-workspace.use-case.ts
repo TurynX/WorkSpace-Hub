@@ -1,21 +1,14 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { throwError } from 'rxjs';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { UpdateWorkSpaceDto } from 'src/workspace/infrastructure/dtos/workspace-dto';
 
 @Injectable()
 export class UpdateWorkSpaceUseCase {
-  constructor(
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepositoty: WorkSpacePort,
-  ) {}
+  constructor(private readonly workSpaceRepositoty: WorkSpacePort) {}
 
   async execute(workSpaceId: string, userId: string, dto: UpdateWorkSpaceDto) {
     const workSpaceExist =

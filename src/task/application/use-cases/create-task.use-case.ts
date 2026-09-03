@@ -1,28 +1,21 @@
 import {
   BadRequestException,
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  PROJECT_PORT,
-  type ProjectPort,
-} from 'src/project/domain/ports/project.port';
-import { TASK_PORT, type TaskPort } from 'src/task/domain/ports/task.port';
+import { ProjectPort } from 'src/project/domain/ports/project.port';
+import { TaskPort } from 'src/task/domain/ports/task.port';
 import { CreateTaskDTO } from 'src/task/infrastructure/dtos/task-dto';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class CreateTaskUseCase {
   constructor(
-    @Inject(TASK_PORT) private readonly taskRepository: TaskPort,
-    @Inject(PROJECT_PORT) private readonly projectRepository: ProjectPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly taskRepository: TaskPort,
+    private readonly projectRepository: ProjectPort,
+    private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 
   async execute(data: CreateTaskDTO, projectId: string, userId: string) {

@@ -1,14 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { WorkSpaceEntity } from 'src/workspace/domain/entities/workspace.entity';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class GetWorkSpaceByIdUseCase {
   constructor(
-    @Inject(WORKSPACE_PORT)
     private readonly workSpaceRepository: WorkSpacePort,
   ) {}
 

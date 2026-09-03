@@ -27,8 +27,13 @@ export class ReportController {
     @Req() req: Request,
   ) {
     const userId = req['user'].sub;
+    const report = await this.createReportUseCase.execute(
+      data,
+      workspaceId,
+      userId,
+    );
     return {
-      data: await this.createReportUseCase.execute(data, workspaceId, userId),
+      data: report,
     };
   }
 

@@ -4,15 +4,13 @@ import {
   UpdateProjectDTO,
 } from 'src/project/infrastructure/dtos/project.dto';
 
-export interface ProjectPort {
-  create(data: CreateProjectDTO, workspaceId: string): Promise<ProjectEntity>;
-  getProjectFromWorkSpace(workspaceId: string): Promise<ProjectEntity[]>;
-  getProjectById(projectId: string): Promise<ProjectEntity | null>;
-  update(
+export abstract class ProjectPort {
+  abstract create(data: CreateProjectDTO, workspaceId: string): Promise<ProjectEntity>;
+  abstract getProjectFromWorkSpace(workspaceId: string): Promise<ProjectEntity[]>;
+  abstract getProjectById(projectId: string): Promise<ProjectEntity | null>;
+  abstract update(
     projectId: string,
     data: UpdateProjectDTO,
   ): Promise<ProjectEntity | null>;
-  delete(projectId: string): Promise<ProjectEntity | null>;
+  abstract delete(projectId: string): Promise<ProjectEntity | null>;
 }
-
-export const PROJECT_PORT = Symbol('PROJECT_PORT');

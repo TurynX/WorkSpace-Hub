@@ -5,38 +5,40 @@ import {
   WorkSpaceWithProjectEntity,
 } from '../entities/workspace.entity';
 
-export interface WorkSpacePort {
-  create(userId: string, name: string, slug: string): Promise<WorkSpaceEntity>;
-  findBySlug(slug: string): Promise<WorkSpaceEntity | null>;
-  getWorkSpaceBelongingToUser(
+export abstract class WorkSpacePort {
+  abstract create(
+    userId: string,
+    name: string,
+    slug: string,
+  ): Promise<WorkSpaceEntity>;
+  abstract findBySlug(slug: string): Promise<WorkSpaceEntity | null>;
+  abstract getWorkSpaceBelongingToUser(
     userId: string,
   ): Promise<WorkSpaceEntity[] | null>;
-  findWorkSpaceById(
+  abstract findWorkSpaceById(
     workSpaceId: string,
   ): Promise<WorkSpaceWithProjectEntity | null>;
 
-  updateWorkSpace(
+  abstract updateWorkSpace(
     workSpaceId: string,
     name: string,
     slug: string,
   ): Promise<WorkSpaceEntity>;
 
-  deleteWorkSpace(workSpaceId: string): Promise<WorkSpaceEntity>;
+  abstract deleteWorkSpace(workSpaceId: string): Promise<WorkSpaceEntity>;
 
-  deleteWorkSpaceMember(
+  abstract deleteWorkSpaceMember(
     workSpaceId: string,
     memberId: string,
   ): Promise<WorkSpaceMemberEntity>;
-  updateWorkSpaceMember(
+  abstract updateWorkSpaceMember(
     workSpaceId: string,
     memberId: string,
     role: WorkspaceRole,
   ): Promise<WorkSpaceMemberEntity>;
 
-  addWorkSpaceMember(
+  abstract addWorkSpaceMember(
     workSpaceId: string,
     invitedId: string,
   ): Promise<WorkSpaceMemberEntity>;
 }
-
-export const WORKSPACE_PORT = 'WORKSPACE_PORT';

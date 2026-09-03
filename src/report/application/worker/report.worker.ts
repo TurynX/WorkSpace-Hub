@@ -4,11 +4,7 @@ import path from 'path';
 import { ReportPort } from 'src/report/domain/ports/report.port';
 import * as fs from 'fs';
 import { PdfGeneratorService } from 'src/report/infrastructure/pdf/pdf-generator.service';
-import { Inject } from '@nestjs/common';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { StoragePort } from 'src/report/domain/ports/storage.port';
 import { ReportStatus } from '@prisma/client';
 
@@ -16,7 +12,7 @@ import { ReportStatus } from '@prisma/client';
 export class ReportWorker extends WorkerHost {
   constructor(
     private readonly reportRepository: ReportPort,
-    @Inject(WORKSPACE_PORT) private readonly workspaceRepository: WorkSpacePort,
+    private readonly workspaceRepository: WorkSpacePort,
     private readonly pdfGeneratorService: PdfGeneratorService,
 
     private readonly minioStorage: StoragePort,

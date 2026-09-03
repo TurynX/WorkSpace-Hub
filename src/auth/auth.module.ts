@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './infrastructure/controllers/auth.controller';
-import { AUTH_PORT } from './domain/ports/auth.port';
+import { AuthPort } from './domain/ports/auth.port';
 import { AuthRepository } from './infrastructure/repository/prisma.repository';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
@@ -12,7 +12,7 @@ import { AuthGuard } from './application/guards/auth.guard';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY! || 'superultrasecretekey123456',
-      signOptions: { expiresIn: '100d' },
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [AuthController],
@@ -23,7 +23,7 @@ import { AuthGuard } from './application/guards/auth.guard';
     AuthGuard,
 
     {
-      provide: AUTH_PORT,
+      provide: AuthPort,
       useClass: AuthRepository,
     },
   ],

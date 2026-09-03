@@ -1,24 +1,18 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Queue } from 'bullmq';
 import { ReportPort } from 'src/report/domain/ports/report.port';
 import { StoragePort } from 'src/report/domain/ports/storage.port';
-import { CreateReportDto } from 'src/report/infrastructure/dtos/report-dto';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from 'src/workspace/domain/ports/workspace.port';
+import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class GetReportUseCase {
   constructor(
     private readonly reportRepository: ReportPort,
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
+    private readonly workSpaceRepository: WorkSpacePort,
     private readonly minioStorage: StoragePort,
   ) {}
 
@@ -36,7 +30,8 @@ export class GetReportUseCase {
     const isMember = workspace.members.some((m) => m.userId === userId);
     if (!isMember) throw new ForbiddenException('Not allowed');
 
-    if (!report.fileKey) throw new NotFoundException('Report not found');
+    if (!report.fileKey)
+      throw new NotFoundException('Report fileKey not found');
 
     const url = await this.minioStorage.generatePresignedUrl(report.fileKey);
 

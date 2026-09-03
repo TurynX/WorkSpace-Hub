@@ -1,21 +1,17 @@
 import {
   ConflictException,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  WORKSPACE_PORT,
-  type WorkSpacePort,
-} from '../../domain/ports/workspace.port';
-import { AUTH_PORT, type AuthPort } from 'src/auth/domain/ports/auth.port';
+import { WorkSpacePort } from '../../domain/ports/workspace.port';
+import { AuthPort } from 'src/auth/domain/ports/auth.port';
 
 @Injectable()
 export class AddWorkSpaceMemberUseCase {
   constructor(
-    @Inject(WORKSPACE_PORT) private readonly workSpaceRepository: WorkSpacePort,
-    @Inject(AUTH_PORT) private readonly authRepository: AuthPort,
+    private readonly workSpaceRepository: WorkSpacePort,
+    private readonly authRepository: AuthPort,
   ) {}
 
   async execute(workSpaceId: string, inviterId: string, invitedEmail: string) {
