@@ -81,31 +81,37 @@ dotenv -e .env.test -- npx jest --config ./test/jest-e2e.json --runInBand
 
 ## 🗺 API Routes Reference
 
-### 🔐 Authentication (`/auth`)
+### 🔐 Authentication
 
 - `POST /auth/register` - Register a new user account.
 - `POST /auth/login` - Authenticate credentials and receive a Bearer JWT token.
 
-### 🏢 Workspaces (`/workspaces`)
+### 🏢 Workspaces
 
 - `POST /workspaces` - Create a new workspace.
 - `GET /workspaces` - List workspaces for the authenticated user.
 - `GET /workspaces/:id` - Fetch details for a specific workspace.
 - `DELETE /workspaces/:id` - Remove a workspace.
 
-### 📋 Tasks (`/task`)
+### 📋 Tasks
 
 - `POST /task` - Create a new task under a workspace.
 - `GET /task/:id` - Get details of a specific task.
 - `PATCH /task/:id` - Update task status, assignee, or details.
-- `POST /task/:id/attachment` - Upload file attachments (`multipart/form-data` with key `file`). Max file size: 10MB.
 
-### 📊 Reports (`/report`)
+### 📁 Attachments
+
+- `POST /task/:taskId/attachment/upload` - Upload file attachments (`multipart/form-data` with key `file`). Max file size: 10MB.
+- `GET /task/:taskId/attachments` - List all attachments for a specific task.
+- `GET /attachment/:attachmentId/download` - Download a specific attachment.
+- `DELETE /attachment/:attachmentId/delete` - Delete a specific attachment.
+
+### 📊 Reports
 
 - `POST /report/generate` - Dispatch an asynchronous BullMQ worker job to render a PDF report via Puppeteer.
 - `GET /report/:id/download` - Retrieve or download the generated PDF report from MinIO.
 
-### 💳 Subscriptions & Payments (`/subscriptions`)
+### 💳 Subscriptions & Payments
 
 - `POST /subscriptions/checkout` - Create a Stripe checkout session for Pro or Enterprise tiers.
 - `POST /subscriptions/webhook` - Handle incoming Stripe webhook events (e.g., payment status updates).
