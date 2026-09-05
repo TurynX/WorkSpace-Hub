@@ -6,12 +6,15 @@ import {
 } from '@nestjs/common';
 import { WorkSpacePort } from '../../domain/ports/workspace.port';
 import { AuthPort } from 'src/auth/domain/ports/auth.port';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 
 @Injectable()
 export class AddWorkSpaceMemberUseCase {
   constructor(
     private readonly workSpaceRepository: WorkSpacePort,
     private readonly authRepository: AuthPort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(workSpaceId: string, inviterId: string, invitedEmail: string) {
@@ -40,6 +43,12 @@ export class AddWorkSpaceMemberUseCase {
       const workspaceMember = await this.workSpaceRepository.addWorkSpaceMember(
         workSpaceId,
         invitedId,
+      );
+
+      await this.auditLogPort.createAuditLog(
+        AuditLogAction.MEMBER_INVITED,
+        inviterId,
+        workSpaceId,
       );
       return workspaceMember;
     }

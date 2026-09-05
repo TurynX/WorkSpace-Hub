@@ -12,6 +12,8 @@ import { StoragePort } from 'src/attachment/domain/ports/storage.port';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { AttachmentEntity } from 'src/attachment/domain/entities/attachment.entity';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
+import { AuditLogAction } from '@prisma/client';
 
 @Injectable()
 export class DeleteAttachmentUseCase {
@@ -22,6 +24,7 @@ export class DeleteAttachmentUseCase {
     private readonly workSpaceRepository: WorkSpacePort,
     @InjectQueue('attachment-queue')
     private readonly deleteQueue: Queue,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -62,6 +65,12 @@ export class DeleteAttachmentUseCase {
 
     if (!deleteAttachmentQueue)
       throw new InternalServerErrorException('Failed to delete attachment');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.ATTACHMENT_DELETED,
+      userId,
+      workspaceId,
+    );
 
     return deleteAttachment;
   }

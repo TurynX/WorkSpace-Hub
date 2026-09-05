@@ -8,6 +8,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AttachmentModule } from './attachment/attachment.module';
 import { ReportModule } from './report/report.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -26,6 +27,8 @@ import { SubscriptionModule } from './subscription/subscription.module';
     AttachmentModule,
     ReportModule,
     SubscriptionModule,
+    AuditModule,
+    AuditModule,
   ],
 })
 export class AppModule {}

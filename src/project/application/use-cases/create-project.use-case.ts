@@ -1,8 +1,11 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { ProjectEntity } from 'src/project/domain/entities/project.entity';
 import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { CreateProjectDTO } from 'src/project/infrastructure/dtos/project.dto';
@@ -13,6 +16,7 @@ export class CreateProjectUseCase {
   constructor(
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -37,6 +41,14 @@ export class CreateProjectUseCase {
     }
 
     const project = await this.projectRepository.create(data, workspaceId);
+    if (!project)
+      throw new InternalServerErrorException('Error creating project');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.PROJECT_CREATED,
+      userId,
+      workspaceId,
+    );
 
     return project;
   }

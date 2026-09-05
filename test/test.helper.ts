@@ -1,3 +1,5 @@
+import { ReportType, WorkspaceRole } from '@prisma/client';
+
 export async function createUser(request: any, app: any) {
   let fullName = `test_${Date.now()}`;
   let email = `${fullName}@gmail.com`;
@@ -50,6 +52,87 @@ export async function createWorkspace(request: any, app: any, token: string) {
   return res.body.data;
 }
 
+export async function updateWorkspace(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .put(`/workspaces/${workspaceId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name: `workspace_${Date.now()}`, slug: `workspace_${Date.now()}` })
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function deleteWorkspace(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .delete(`/workspaces/${workspaceId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function addMemberToWorkspace(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+  email: string,
+) {
+  const res = await request(app.getHttpServer())
+    .post(`/workspaces/${workspaceId}/members/add`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      email,
+    })
+
+    .expect(201);
+
+  return res.body.data;
+}
+
+export async function updateWorkspaceMember(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+  memberId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .patch(`/workspaces/${workspaceId}/members/${memberId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      role: WorkspaceRole.MEMBER,
+    })
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function deleteWorkspaceMember(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+  memberId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .delete(`/workspaces/${workspaceId}/members/${memberId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(200);
+
+  return res.body.data;
+}
+
 export async function createProject(
   request: any,
   app: any,
@@ -63,6 +146,38 @@ export async function createProject(
     .set('Authorization', `Bearer ${token}`)
     .send({ name, description })
     .expect(201);
+
+  return res.body.data;
+}
+
+export async function updateProject(
+  request: any,
+  app: any,
+  token: string,
+  projectId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .put(`/project/${projectId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      name: `project_${Date.now()}`,
+      description: `project_${Date.now()}`,
+    })
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function deleteProject(
+  request: any,
+  app: any,
+  token: string,
+  projectId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .delete(`/project/${projectId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(200);
 
   return res.body.data;
 }
@@ -87,6 +202,58 @@ export async function createTask(
       description,
       dueDate,
       priority,
+    })
+    .expect(201);
+
+  return res.body.data;
+}
+
+export async function updateTask(
+  request: any,
+  app: any,
+  token: string,
+  projectId: string,
+  taskId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .put(`/project/${projectId}/task/${taskId}/update`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      title: `task_${Date.now()}`,
+      description: `task_${Date.now()}`,
+    })
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function deleteTask(
+  request: any,
+  app: any,
+  token: string,
+  projectId: string,
+  taskId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .delete(`/project/${projectId}/task/${taskId}/delete`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(200);
+
+  return res.body.data;
+}
+
+export async function generateReport(
+  request: any,
+  app: any,
+  token: string,
+  workspaceId: string,
+) {
+  const res = await request(app.getHttpServer())
+    .post(`/workspace/${workspaceId}/report/create`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      type: ReportType.WORKSPACE_SUMMARY,
+      title: `report_ ${Date.now()}`,
     })
     .expect(201);
 

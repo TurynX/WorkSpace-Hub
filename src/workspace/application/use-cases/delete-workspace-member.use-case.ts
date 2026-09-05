@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
+
 @Injectable()
 export class DeleteWorkSpaceMemberUseCase {
   constructor(
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(workspaceId: string, requesterId: string, memberId: string) {
@@ -35,6 +39,11 @@ export class DeleteWorkSpaceMemberUseCase {
       if (memberToRemove.role === 'OWNER' || memberToRemove.role === 'ADMIN')
         throw new ForbiddenException('You cannot delete this member');
 
+      await this.auditLogPort.createAuditLog(
+        AuditLogAction.MEMBER_REMOVED,
+        requesterId,
+        workspaceId,
+      );
       const deleted = await this.workSpaceRepository.deleteWorkSpaceMember(
         workspaceId,
         memberId,

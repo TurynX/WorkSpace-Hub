@@ -74,9 +74,9 @@ export class WorkspaceController {
     return { message: 'Workspaces found successfully', data: workspace };
   }
 
-  @Get(':id')
+  @Get(':workspaceId')
   @HttpCode(HttpStatus.OK)
-  async findById(@Param('id') workSpaceId: string) {
+  async findById(@Param('workspaceId') workSpaceId: string) {
     const workSpace = await this.findWorkSpaceByIdUseCase.execute(workSpaceId);
 
     if (!workSpace) {
@@ -85,18 +85,18 @@ export class WorkspaceController {
     return { message: 'Workspace found successfully', data: workSpace };
   }
 
-  @Put(':id')
+  @Put(':workspaceId')
   @HttpCode(HttpStatus.OK)
   async update(
     @Req() req: Request,
     @Body() data: UpdateWorkSpaceDto,
-    @Param('id') id: string,
+    @Param('workspaceId') workspaceId: string,
   ) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('userId not provided');
 
     const workSpace = await this.updateWorkSpaceUseCase.execute(
-      id,
+      workspaceId,
       userId,
       data,
     );
@@ -104,15 +104,42 @@ export class WorkspaceController {
     return { message: 'Workspace updated successfully', data: workSpace };
   }
 
-  @Delete(':id')
+  @Delete(':workspaceId')
   @HttpCode(HttpStatus.OK)
-  async delete(@Req() req: Request, @Param('id') id: string) {
+  async delete(@Req() req: Request, @Param('workspaceId') workspaceId: string) {
     const userId = req['user'].sub;
     if (!userId) throw new UnauthorizedException('userId not provided');
 
-    const workSpace = await this.deleteWorkSpaceUseCase.execute(id, userId);
+    const workSpace = await this.deleteWorkSpaceUseCase.execute(
+      workspaceId,
+      userId,
+    );
+
+    if (!workSpace) {
+      throw new InternalServerErrorException('Failed to delete workspace');
+    }
 
     return { message: 'WorkSpace deleted successfully', data: workSpace };
+  }
+
+  @Post(':workspaceId/members/add')
+  @HttpCode(HttpStatus.CREATED)
+  async addMember(
+    @Req() req: Request,
+    @Param('workspaceId') workSpaceId: string,
+    @Body() dto: AddWorkSpaceMemberDto,
+  ) {
+    const inviterId = req['user'].sub;
+    if (!inviterId) throw new UnauthorizedException('userId not provided');
+    const invitedEmail = dto.email;
+
+    const member = await this.addWorkSpaceMemberUseCase.execute(
+      workSpaceId,
+      inviterId,
+      invitedEmail,
+    );
+
+    return { message: 'Member added successfully', data: member };
   }
 
   @Get(':workspaceId/members')
@@ -149,26 +176,6 @@ export class WorkspaceController {
     );
 
     return { message: 'Member updated successfully', data: member };
-  }
-
-  @Post(':workspaceId/members/add')
-  @HttpCode(HttpStatus.CREATED)
-  async addMember(
-    @Req() req: Request,
-    @Param('workspaceId') workSpaceId: string,
-    @Body() dto: AddWorkSpaceMemberDto,
-  ) {
-    const inviterId = req['user'].sub;
-    if (!inviterId) throw new UnauthorizedException('userId not provided');
-    const invitedEmail = dto.email;
-
-    const member = await this.addWorkSpaceMemberUseCase.execute(
-      workSpaceId,
-      inviterId,
-      invitedEmail,
-    );
-
-    return { message: 'Member added successfully', data: member };
   }
 
   @Delete(':workspaceId/members/:memberId')

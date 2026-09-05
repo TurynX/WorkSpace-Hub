@@ -3,12 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 
 @Injectable()
 export class DeleteWorkSpaceUseCase {
   constructor(
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(workSpaceId: string, userId: string) {
@@ -27,6 +30,13 @@ export class DeleteWorkSpaceUseCase {
         'You do not have permission to delete this WorkSpace',
       );
 
-    return await this.workSpaceRepository.deleteWorkSpace(workSpaceId);
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.WORKSPACE_DELETED,
+      userId,
+      workSpaceId,
+    );
+    const deleted = await this.workSpaceRepository.deleteWorkSpace(workSpaceId);
+
+    return deleted;
   }
 }

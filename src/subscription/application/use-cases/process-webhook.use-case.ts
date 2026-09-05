@@ -1,12 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { SubscriptionTier } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { AuditLogAction, SubscriptionTier } from '@prisma/client';
 import { SubscriptionPort } from 'src/subscription/domain/ports/subscription.port';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import Stripe from 'stripe';
 
 @Injectable()
 export class ProcessWebhookUseCase {
   private stripe: Stripe;
-  constructor(private readonly subscriptionPort: SubscriptionPort) {
+  constructor(
+    private readonly subscriptionPort: SubscriptionPort,
+    private readonly auditLogPort: AuditLogPort,
+  ) {
     this.stripe = new Stripe(process.env.STRIPE_API_KEY!, {
       apiVersion: '2026-08-26.dahlia',
     });
@@ -63,6 +71,17 @@ export class ProcessWebhookUseCase {
             tier,
             currentPeriodEnd,
           );
+
+        if (!updatedSubscription)
+          throw new InternalServerErrorException(
+            'Failed to update subscription',
+          );
+
+        await this.auditLogPort.createAuditLog(
+          AuditLogAction.SUBSCRIPTION_UPDATED,
+          workspaceId,
+          session.client_reference_id!,
+        );
         return updatedSubscription;
       }
 

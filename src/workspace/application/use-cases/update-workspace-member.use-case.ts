@@ -7,11 +7,14 @@ import {
 import { WorkspaceRole } from '@prisma/client';
 import { WorkSpaceMemberEntity } from 'src/workspace/domain/entities/workspace.entity';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 
 @Injectable()
 export class UpdateWorkSpaceMemberUseCase {
   constructor(
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -50,6 +53,12 @@ export class UpdateWorkSpaceMemberUseCase {
 
     if (!member)
       throw new InternalServerErrorException('Failed to update member');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.MEMBER_ROLE_CHANGED,
+      userId,
+      workspaceId,
+    );
     return member;
   }
 }

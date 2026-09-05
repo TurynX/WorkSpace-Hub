@@ -5,6 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { TaskPort } from 'src/task/domain/ports/task.port';
 import { CreateTaskDTO } from 'src/task/infrastructure/dtos/task-dto';
@@ -16,6 +18,7 @@ export class CreateTaskUseCase {
     private readonly taskRepository: TaskPort,
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(data: CreateTaskDTO, projectId: string, userId: string) {
@@ -46,6 +49,12 @@ export class CreateTaskUseCase {
 
     const task = await this.taskRepository.create(data, projectId, userId);
     if (!task) throw new InternalServerErrorException('Error creating task');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.TASK_CREATED,
+      userId,
+      workspaceId,
+    );
     return task;
   }
 }

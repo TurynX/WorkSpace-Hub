@@ -11,6 +11,8 @@ import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { AttachmentEntity } from 'src/attachment/domain/entities/attachment.entity';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
+import { AuditLogAction } from '@prisma/client';
 
 @Injectable()
 export class UploadAttachmentUseCase {
@@ -20,6 +22,7 @@ export class UploadAttachmentUseCase {
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
     @InjectQueue('attachment-queue') private uploadQueue: Queue,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -69,6 +72,12 @@ export class UploadAttachmentUseCase {
         file.originalname,
         file.mimetype,
         file.size,
+      );
+
+      await this.auditLogPort.createAuditLog(
+        AuditLogAction.ATTACHMENT_UPLOADED,
+        userId,
+        workspaceId,
       );
       return attachment;
     } catch (error) {

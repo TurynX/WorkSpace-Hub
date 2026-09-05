@@ -10,6 +10,8 @@ import {
 import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
 import { UpdateTaskDTO } from 'src/task/infrastructure/dtos/task-dto';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 
 @Injectable()
 export class UpdateTaskUseCase {
@@ -17,6 +19,7 @@ export class UpdateTaskUseCase {
     private readonly taskRepository: TaskPort,
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -57,6 +60,12 @@ export class UpdateTaskUseCase {
 
     if (!task)
       throw new InternalServerErrorException('Error while updating the task');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.TASK_UPDATED,
+      userId,
+      workspaceId,
+    );
 
     return task;
   }

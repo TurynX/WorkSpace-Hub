@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 
 @Injectable()
 export class DeleteTaskUseCase {
@@ -15,6 +17,7 @@ export class DeleteTaskUseCase {
     private readonly taskRepository: TaskPort,
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -50,6 +53,11 @@ export class DeleteTaskUseCase {
     const task = await this.taskRepository.delete(taskId);
     if (!task) throw new NotFoundException('Task not found');
 
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.TASK_DELETED,
+      userId,
+      workspaceId,
+    );
     return task;
   }
 }

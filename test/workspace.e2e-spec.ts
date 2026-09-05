@@ -101,7 +101,6 @@ describe('WorkspaceController (e2e)', () => {
       .set('Authorization', `Bearer ${user.token}`)
       .send({
         email: user.email2,
-        role: 'MEMBER',
       })
       .expect(201);
 

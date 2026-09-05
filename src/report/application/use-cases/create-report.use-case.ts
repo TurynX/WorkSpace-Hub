@@ -2,9 +2,12 @@ import { InjectQueue } from '@nestjs/bullmq';
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
 import { Queue } from 'bullmq';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { ReportPort } from 'src/report/domain/ports/report.port';
 import { CreateReportDto } from 'src/report/infrastructure/dtos/report-dto';
 import { WorkSpacePort } from 'src/workspace/domain/ports/workspace.port';
@@ -15,6 +18,7 @@ export class CreateReportUseCase {
     private readonly reportRepository: ReportPort,
     private readonly workSpaceRepository: WorkSpacePort,
     @InjectQueue('report-queue') private readonly reportQueue: Queue,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(data: CreateReportDto, workspaceId: string, userId: string) {
@@ -29,12 +33,21 @@ export class CreateReportUseCase {
 
     const report = await this.reportRepository.create(data, workspaceId);
 
+    if (!report)
+      throw new InternalServerErrorException('Failed to create report');
+
     await this.reportQueue.add('generate-report', {
       workspaceName: workspace.name,
       reportId: report.id,
       workspaceId,
       type: data.type,
     });
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.REPORT_GENERATED,
+      userId,
+      workspaceId,
+    );
 
     return report;
   }

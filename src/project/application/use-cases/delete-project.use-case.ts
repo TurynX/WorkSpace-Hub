@@ -4,6 +4,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { ProjectEntity } from 'src/project/domain/entities/project.entity';
 
 import { ProjectPort } from 'src/project/domain/ports/project.port';
@@ -14,6 +16,7 @@ export class DeleteProjectUseCase {
   constructor(
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(userId: string, projectId: string): Promise<ProjectEntity> {
@@ -42,6 +45,12 @@ export class DeleteProjectUseCase {
 
     if (!deletedProject)
       throw new InternalServerErrorException('Failed to delete project');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.PROJECT_DELETED,
+      userId,
+      project.workspaceId,
+    );
 
     return deletedProject;
   }

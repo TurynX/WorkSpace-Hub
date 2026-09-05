@@ -4,6 +4,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditLogAction } from '@prisma/client';
+import { AuditLogPort } from 'src/audit/domain/ports/auditLog.port';
 import { ProjectEntity } from 'src/project/domain/entities/project.entity';
 import { ProjectPort } from 'src/project/domain/ports/project.port';
 import { CreateProjectDTO } from 'src/project/infrastructure/dtos/project.dto';
@@ -14,6 +16,7 @@ export class UpdateProjectUseCase {
   constructor(
     private readonly projectRepository: ProjectPort,
     private readonly workSpaceRepository: WorkSpacePort,
+    private readonly auditLogPort: AuditLogPort,
   ) {}
 
   async execute(
@@ -46,6 +49,12 @@ export class UpdateProjectUseCase {
 
     if (!updatedProject)
       throw new InternalServerErrorException('Failed to update project');
+
+    await this.auditLogPort.createAuditLog(
+      AuditLogAction.PROJECT_UPDATED,
+      userId,
+      project.workspaceId,
+    );
 
     return updatedProject;
   }
